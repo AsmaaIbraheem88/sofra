@@ -30,7 +30,6 @@ Route::group(['prefix' => 'v1' , 'namespace' => 'Api'],function(){
     Route::get('meals','GeneralController@meals');
     Route::get('meal','GeneralController@meal');
     Route::get('restaurant/comments','GeneralController@comments');
-    Route::get('payments','GeneralController@payments');
     Route::get('offers','GeneralController@offers');
     Route::get('offer','GeneralController@offer');
     Route::post('contact','GeneralController@contact');
@@ -57,9 +56,19 @@ Route::group(['prefix' => 'v1' , 'namespace' => 'Api'],function(){
             Route::get('notifications','AuthController@notifications');
             Route::get('notifications-count','AuthController@notificationsCount');
 
-
             Route::get('orders','OrderController@orders');
             Route::get('order','OrderController@order');
+            Route::post('new-order','OrderController@newOrder');
+            Route::post('decline-order','OrderController@declineOrder');
+            Route::post('accept-order','OrderController@acceptOrder');
+
+            Route::post('new-comment','AuthController@newComment');
+
+
+           
+           
+
+           
            
 			
 		});
@@ -86,17 +95,26 @@ Route::group(['prefix' => 'v1' , 'namespace' => 'Api'],function(){
             Route::get('notifications','AuthController@notifications');
             Route::get('notifications-count','AuthController@notificationsCount');
 
-            Route::post('meals/create','MealController@create');
-            Route::post('meals/update/{id}','MealController@update');
-            Route::delete('meals/delete/{id}','MealController@delete');
+            Route::post('new-meal','MealController@newMeal');
+            Route::post('update-meal','MealController@updateMeal');
+            Route::post('delete-meal','MealController@deleteMeal');
 
-            Route::post('offers/create','OfferController@create');
-            Route::post('offers/update/{id}','OfferController@update');
-            Route::delete('offers/delete/{id}','OfferController@delete');
+            Route::post('new-offer','OfferController@newOffer');
+            Route::post('update-offer','OfferController@updateOffer');
+            Route::post('delete-offer','OfferController@deleteOffer');
 
 
+
+            Route::post('accept-order','OrderController@acceptOrder')->middleware('check-commissions');
+            // Route::post('confirm-order','OrderController@confirmrOrder');
+            Route::post('reject-order','OrderController@rejectOrder');
             Route::get('orders','OrderController@orders');
             Route::get('order','OrderController@order');
+
+
+            Route::post('change-state','AuthController@changeStatus');
+
+            Route::get('commissions','AuthController@commissions');
 			
 		});
 	});
@@ -104,6 +122,5 @@ Route::group(['prefix' => 'v1' , 'namespace' => 'Api'],function(){
 
 
 /////////////////////////////////////////////////////////////////////
-
 
 

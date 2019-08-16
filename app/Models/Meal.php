@@ -11,10 +11,6 @@ class Meal extends Model
     public $timestamps = true;
     protected $fillable = array('name', 'image', 'price', 'discount_price', 'processing_time', 'description', 'restaurant_id');
 
-    // public function getImageFullPathAttribute()
-    // {
-    //     return asset($this->image);
-    // }
 
     public function orders()
     {

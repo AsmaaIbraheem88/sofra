@@ -389,6 +389,52 @@ public function notificationsCount(Request $request)
 
   ///////////////////////////////////////////////////////////////
 
+  public function commissions(Request $request )
+  {
+
+    $count = $request->user()->orders()->whereIn('status',['delivered', 'declined'])->count();
+
+    $total = $request->user()->orders()->whereIn('status',['delivered', 'declined'])->sum('total_price');
+
+    $commission = $request->user()->orders()->whereIn('status',['delivered', 'declined'])->sum('commission'); 
+    
+    $payments = $request->user()->payments()->sum('amount');
+
+
+
+    return responseJson('1','',compact('count','total','commission','payments'));
+
+
+  } 
+
+  ///////////////////////////////////////////////////////////////
+
+  public function changeStatus(Request $request )
+  {
+   
+    $restaurant = $request->user();
+
+    $state = $restaurant->status;
+
+    if ($state == 'open')
+    {
+
+      $restaurant->update(['status' => 'close']);
+
+    }elseif($state == 'close')
+    {
+     
+      $restaurant->update(['status' => 'open']);
+
+    }
+    
+ 
+   return responseJson(1,'تم تحديث حاله المطعم',$restaurant);
+
+
+}
+
+/////////////////////////////////////////////////////////////////////////
 
 
 }

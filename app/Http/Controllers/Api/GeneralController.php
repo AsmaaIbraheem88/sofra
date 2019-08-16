@@ -70,11 +70,11 @@ class GeneralController extends Controller
 
     public function settings( )
     {
-        //return responseJson(1, 'loaded', settings());
+        return responseJson(1, 'loaded', settings());
 
-        $settings = Settings::find(1);
+        // $settings = Settings::find(1);
 
-        return responseJson('1','success',$settings);
+        // return responseJson('1','success',$settings);
     }
 
     ///////////////////////////////////////////////////
@@ -99,7 +99,7 @@ class GeneralController extends Controller
                     $query->where('districts.city_id',$request->city_id);
                 });
             }
-            // cat & (title || content)
+            // city & (title || phone)
             if ($request->input('keyword'))
             {
                 $query->where(function($query) use($request){
@@ -159,23 +159,11 @@ class GeneralController extends Controller
     }
 
     ///////////////////////////////////////////////////
-    
-    // public function payments(Request $request)// for one restaurant //
-    // {
-    //     $payments = Payment::where('restaurant_id',$request->restaurant_id)->get();
 
-    //     return responseJson('1','success',$payments);
-    // }
-
-    
-
-    ///////////////////////////////////////////////////
-    
 
     public function offers( )
     {
-        $now = Carbon::now();
-
+        $now = Carbon::now()->toDateTimeString();
         $offers = Offer::where('start_date', '<=', $now)
         ->where('end_date', '>=', $now)
         ->latest()->paginate(20);

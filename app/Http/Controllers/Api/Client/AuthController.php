@@ -273,6 +273,8 @@ public function notificationsCount(Request $request)
 
       'token'=>'required',  
       'type'=>'required|in:android,ios', 
+      
+      
 
     ]);
 
@@ -334,6 +336,42 @@ public function notificationsCount(Request $request)
 
   ///////////////////////////////////////////////////////////////
 
+  public function newComment(Request $request )
+  {
+
+    $validator = validator()->make($request->all(),[
+
+      'restaurant_id'=>'required',  
+      'rate' => [
+        'required',
+        Rule::in([1,2,3,4,5])
+    ]
+
+    ]);
+
+     if($validator->fails())
+      {
+          $data = $validator->errors();
+          return responseJson('0',$validator->errors()->first(),$data);
+
+      }
+
+     
+
+      $request->user()->comments()->create([
+
+        'restaurant_id'=>$request->restaurant_id, 
+        'rate' =>$request->rate,
+        'content' =>(isset($request->content)) ? $request->content : ''
+
+      ]);
+
+
+
+       return responseJson('1','تم انشاء التقييم');
+
+
+  } 
 
 
 }

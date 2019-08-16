@@ -11,4 +11,8 @@ class PaymentMethod extends Model
     public $timestamps = true;
     protected $fillable = array('type');
 
+    public function orders(){
+        $this->hasMany('App\Models\Order');
+    }
+
 }

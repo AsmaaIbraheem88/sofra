@@ -13,7 +13,7 @@ use Illuminate\Support\Facades\File;
 
 class OfferController extends Controller
 {
-     public function create(Request $request )
+     public function newOffer(Request $request )
 
      {
       
@@ -21,8 +21,8 @@ class OfferController extends Controller
 
         'content' => 'required',
         'title' => 'required',
-        'start_date' => 'required|date_format:Y-m-d',
-        'end_date' =>'required|date_format:Y-m-d|after:start_date',
+        'start_date' => 'required|date_format:Y-m-d H:i:s',
+        'end_date' =>'required|date_format:Y-m-d H:i:s|after:start_date',
         'image' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048'
 
       ]);
@@ -64,16 +64,16 @@ class OfferController extends Controller
 
 
     /////////////////////////////////////////////////////////////////
-    public function update(Request $request,$id)
+    public function updateOffer(Request $request)
     {
       
 
       $validator = validator()->make($request->all(),[
-
+        'offer_id' => 'required|exists:offers,id',
         'content' => 'required',
         'title' => 'required',
-        'start_date' => 'required|date_format:Y-m-d',
-        'end_date' =>'required|date_format:Y-m-d|after:start_date',
+        'start_date' => 'required|date_format:Y-m-d H:i:s',
+        'end_date' =>'required|date_format:Y-m-d H:i:s|after:start_date',
         'image' => 'image|mimes:jpeg,png,jpg,gif,svg|max:2048'
         
       ]);
@@ -87,7 +87,7 @@ class OfferController extends Controller
     }
 
 
-    $offer = Offer::find($id);
+    $offer = Offer::find($request->offer_id);
     
 
     if (!$offer) {
@@ -129,14 +129,27 @@ class OfferController extends Controller
   }
 
 /////////////////////////////////////////////////////////////////////////
-public function delete(Request $request,$id )
+public function deleteOffer(Request $request)
 {
 
-   $offer=  Offer::find($id);
+  $validator = validator()->make($request->all(),[
+    'offer_id' => 'required|exists:offers,id',
+  ]);
+
+  if($validator->fails())
+  {
+      $data = $validator->errors();
+      return responseJson('0',$validator->errors()->first(),$data);
+
+  }
+
+
+   $offer=  Offer::find($request->offer_id);
 
   if (!$offer) {
     return responseJson(0, '404 no offer found');
   }
+  
 
   // \Storage::delete($offer->image);
 

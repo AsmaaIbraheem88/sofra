@@ -1,19 +1,19 @@
 <?php
 
 namespace App\Http\Controllers\Api\Restaurant;
-
-
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Http\Request;
 
 use App\Http\Controllers\Controller;
 
 use App\Models\Meal;
 
-use Illuminate\Support\Facades\File;
+use Image;
+
 
 class MealController extends Controller
 {
-     public function create(Request $request )
+     public function newMeal(Request $request )
 
      {
 
@@ -52,12 +52,8 @@ class MealController extends Controller
 
           $meal->image = $fileNameToStore;
 
-
         };
 
-       
-
-        $meal->save();
         
 
       return responseJson('1','تم الاضافه بنجاح',$meal);
@@ -65,12 +61,12 @@ class MealController extends Controller
 
 
     /////////////////////////////////////////////////////////////////
-    public function update(Request $request,$id)
+    public function updateMeal(Request $request)
     {
       
 
       $validator = validator()->make($request->all(),[
-
+        'meal_id' => 'required|exists:meals,id',
         'name' => 'required',
         'processing_time' => 'required',
         'description' => 'required',
@@ -89,7 +85,7 @@ class MealController extends Controller
     }
 
 
-    $meal = Meal::find($id);
+    $meal = Meal::find($request->meal_id);
 
     if (!$meal) {
       return responseJson(0, '404 no meal found');
@@ -128,14 +124,32 @@ class MealController extends Controller
   }
 
 /////////////////////////////////////////////////////////////////////////
-public function delete(Request $request,$id )
+public function deleteMeal(Request $request)
 {
 
-   $meal=  Meal::find($id);
+  $validator = validator()->make($request->all(),[
+    'meal_id' => 'required|exists:meals,id',
+  ]);
+
+
+  if($validator->fails())
+  {
+      $data = $validator->errors();
+      return responseJson('0',$validator->errors()->first(),$data);
+
+  }
+
+  $meal=  Meal::find($request->meal_id);
+
 
   if (!$meal) {
     return responseJson(0, '404 no meal found');
   }
+
+  if($meal->orders()->count())
+   {
+      return responseJson('0','هذه الوجبه موجوده في طلبات');
+   }
 
   // \Storage::delete($meal->image);
 

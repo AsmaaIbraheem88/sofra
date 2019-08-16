@@ -11,10 +11,6 @@ class Restaurant extends Model
     public $timestamps = true;
     protected $fillable = array('name', 'email', 'phone', 'district_id', 'minimum_charge', 'delivery_cost', 'whatsapp_link', 'image', 'status');
 
-    // public function getImageFullPathAttribute()
-    // {
-    //     return asset($this->image);
-    // }
 
 
     public function categories()
@@ -61,5 +57,18 @@ class Restaurant extends Model
     {
         return $this->hasMany('App\Models\Meal');
     }
+
+    public function getTotalCommissionsAttribute()
+    {
+        $commissions = $this->orders()->where('status','delivered')->sum('commission');
+        return $commissions;
+    }
+
+    public function getTotalPaymentsAttribute()
+    {
+        $payments = $this->payments()->sum('amount');
+        return $payments;
+    }
+
 
 }

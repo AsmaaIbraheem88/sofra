@@ -11,10 +11,7 @@ class Offer extends Model
     public $timestamps = true;
     protected $fillable = array('content', 'restaurant_id', 'title', 'start_date', 'end_date', 'image');
 
-    // public function getImageFullPathAttribute()
-    // {
-    //     return asset($this->image);
-    // }
+   
 
     public function restaurant()
     {

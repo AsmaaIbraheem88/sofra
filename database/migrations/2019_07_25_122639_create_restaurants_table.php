@@ -18,7 +18,7 @@ class CreateRestaurantsTable extends Migration {
 			$table->decimal('delivery_cost');
 			$table->string('whatsapp_link');
 			$table->string('image');
-			$table->boolean('status')->default(1);
+			$table->enum('status', array('open', 'close'))->default('open');
 			$table->string('password');
 			$table->string('pin_code')->nullable();
 			$table->string('api_token', 60)->unique()->nullable();

@@ -12,6 +12,7 @@ class CreateSettingsTable extends Migration {
 			$table->timestamps();
 			$table->text('about_msg');
 			$table->decimal('commission');
+			//$table->decimal('max_credit'); // to compare  payments  to restaurant
 			$table->text('commission_msg1');
 			$table->text('commission_msg2');
 		});
