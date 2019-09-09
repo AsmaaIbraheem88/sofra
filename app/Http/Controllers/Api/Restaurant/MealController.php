@@ -19,11 +19,13 @@ class MealController extends Controller
 
       $validator = validator()->make($request->all(),[
 
-        'name' => 'required',
+        'name_ar' => 'required',
+        'name_en' => 'required',
+        'description_ar' => 'required',
+        'description_en' => 'required',
         'processing_time' => 'required',
-        'description' => 'required',
-        'discount_price' => 'required',
-        'price' => 'required',
+        'discount_price' => 'required|numeric',
+        'price' => 'required|numeric',
         'image' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048'
 
       ]);
@@ -48,14 +50,14 @@ class MealController extends Controller
 
           $fileNameToStore = $filename.'_'.time().'.'.$extension;
           // upload
-          $path = $request->file('image')->storeAs('public/admin/images/meals', $fileNameToStore);
+          $path = $request->file('image')->storeAS('public/meals', $fileNameToStore);
 
           $meal->image = $fileNameToStore;
 
         };
 
-        
-
+        $meal->save();
+      
       return responseJson('1','تم الاضافه بنجاح',$meal);
     }
 
@@ -66,10 +68,12 @@ class MealController extends Controller
       
 
       $validator = validator()->make($request->all(),[
-        'meal_id' => 'required|exists:meals,id',
-        'name' => 'required',
+
+        'name_ar' => 'required',
+        'name_en' => 'required',
+        'description_ar' => 'required',
+        'description_en' => 'required',
         'processing_time' => 'required',
-        'description' => 'required',
         'discount_price' => 'required',
         'price' => 'required',
         'image' => 'image|mimes:jpeg,png,jpg,gif,svg|max:2048',
@@ -85,17 +89,18 @@ class MealController extends Controller
     }
 
 
-    $meal = Meal::find($request->meal_id);
-
-    if (!$meal) {
-      return responseJson(0, '404 no meal found');
+    $meal = $request->user()->meals()->find($request->item_id);
+    if (!$meal)
+    {
+        return responseJson(0,'لا يمكن الحصول على البيانات');
     }
-
      
     $meal->update($request->except(['image']));
 
 
     if($request->hasFile('image')){
+
+      Storage::delete('public/meals/'. $meal->image);
 
       $fileNameWithExt = $request->file('image')->getClientOriginalName();
       // get file name
@@ -105,16 +110,12 @@ class MealController extends Controller
 
       $fileNameToStore = $filename.'_'.time().'.'.$extension;
       // upload
-      $path = $request->file('image')->storeAs('public/admin/images/meals/', $fileNameToStore);
+      $path = $request->file('image')->storeAS('public/meals', $fileNameToStore);
 
-      //  $oldFilename=$meal->image;
 
       $meal->image = $fileNameToStore;
 
-      //  File::delete(public_path('public/admin/images/meals/'. $oldFilename));
-
-
-    };
+    }
 
     $meal->save();
 
@@ -127,31 +128,20 @@ class MealController extends Controller
 public function deleteMeal(Request $request)
 {
 
-  $validator = validator()->make($request->all(),[
-    'meal_id' => 'required|exists:meals,id',
-  ]);
+  $meal = $request->user()->meals()->find($request->item_id);
 
-
-  if($validator->fails())
+  if (!$meal)
   {
-      $data = $validator->errors();
-      return responseJson('0',$validator->errors()->first(),$data);
-
-  }
-
-  $meal=  Meal::find($request->meal_id);
-
-
-  if (!$meal) {
-    return responseJson(0, '404 no meal found');
+      return responseJson(0,'لا يمكن الحصول على البيانات');
   }
 
   if($meal->orders()->count())
-   {
-      return responseJson('0','هذه الوجبه موجوده في طلبات');
-   }
+  {
+      $meal->update(['disabled' => 'disable']);
+      return responseJson(1,'تم الحذف بنجاح');
+  }
 
-  // \Storage::delete($meal->image);
+  Storage::delete('public/meals/'. $meal->image);
 
   $meal->delete();
 

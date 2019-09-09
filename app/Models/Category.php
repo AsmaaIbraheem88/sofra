@@ -9,7 +9,7 @@ class Category extends Model
 
     protected $table = 'categories';
     public $timestamps = true;
-    protected $fillable = array('name');
+    protected $fillable = array('name_ar','name_en');
 
     public function restaurants()
     {

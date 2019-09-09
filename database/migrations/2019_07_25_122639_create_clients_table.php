@@ -15,9 +15,11 @@ class CreateClientsTable extends Migration {
 			$table->string('phone');
 			$table->integer('district_id');
 			$table->string('password');
+			$table->text('address');
+			$table->string('profile_image');
 			$table->string('pin_code')->nullable();
 			$table->string('api_token', 60)->unique()->nullable();
-			$table->boolean('is_active')->default(1);
+			$table->enum('is_active', array('active', 'inactive'))->default('active');
 		});
 	}
 

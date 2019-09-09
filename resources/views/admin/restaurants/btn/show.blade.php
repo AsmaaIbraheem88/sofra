@@ -1,0 +1,1 @@
+<a href="{{ aurl('restaurants/'.$id.'/show') }}" class="btn btn-info"><i class="fa fa-eye"></i></a>

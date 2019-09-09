@@ -35,6 +35,7 @@ function responseJson($status,$msg,$data=null)
 
 function notifyByFirebase($title,$body,$tokens,$data = [])        // paramete 5 =>>>> $type
 {
+//    dd(env('FIREBASE_API_KEY'));
 // https://gist.github.com/rolinger/d6500d65128db95f004041c2b636753a
 // API access key from Google FCM App Console
     // env('FCM_API_ACCESS_KEY'));
@@ -90,5 +91,121 @@ function notifyByFirebase($title,$body,$tokens,$data = [])        // paramete 5 
     return $result;
 }
 
+
+////////////////////////////////////////////////////////////////////
+
+if (!function_exists('aurl')) {    //To make url(‘admin/’) dynamic
+	function aurl($url = null) {
+		return url('admin/'.$url);
+	}
+}
+
+//////////////////////////////////////////////////////////////
+
+if (!function_exists('admin')) {  //To make auth()->guard('admin') dynamic
+	function admin() {
+		return auth()->guard('admin');
+	}
+}
+
+//////////////////////////////////////////////////
+
+if (!function_exists('lang')) {
+	function lang() {
+		if (session()->has('lang')) {
+			return session('lang');
+		} else {
+			return setting()->main_lang;
+		}
+	}
+}
+
+//////////////////////////////////////////////////////////
+if (!function_exists('direction')) {
+	function direction() {
+		if (session()->has('lang')) {
+			if (session('lang') == 'ar') {
+				return 'rtl';
+			} else {
+				return 'ltr';
+			}
+		} else {
+			return 'ltr';
+		}
+	}
+}
+
+////////////////////////////////////////////////////////
+if (!function_exists('datatable_lang')) {
+	function datatable_lang() {
+		return ['sProcessing' => trans('admin.sProcessing'),
+			'sLengthMenu'        => trans('admin.sLengthMenu'),
+			'sZeroRecords'       => trans('admin.sZeroRecords'),
+			'sEmptyTable'        => trans('admin.sEmptyTable'),
+			'sInfo'              => trans('admin.sInfo'),
+			'sInfoEmpty'         => trans('admin.sInfoEmpty'),
+			'sInfoFiltered'      => trans('admin.sInfoFiltered'),
+			'sInfoPostFix'       => trans('admin.sInfoPostFix'),
+			'sSearch'            => trans('admin.sSearch'),
+			'sUrl'               => trans('admin.sUrl'),
+			'sInfoThousands'     => trans('admin.sInfoThousands'),
+			'sLoadingRecords'    => trans('admin.sLoadingRecords'),
+			'oPaginate'          => [
+				'sFirst'            => trans('admin.sFirst'),
+				'sLast'             => trans('admin.sLast'),
+				'sNext'             => trans('admin.sNext'),
+				'sPrevious'         => trans('admin.sPrevious'),
+			],
+			'oAria'            => [
+				'sSortAscending'  => trans('admin.sSortAscending'),
+				'sSortDescending' => trans('admin.sSortDescending'),
+			],
+		];
+	}
+}
+
+
+/////////////////////////////////////////////////////////////////////////////
+
+if (!function_exists('setting')) {
+	function setting() {
+		$settings =  \App\Models\Settings::find(1);
+    
+		if ($settings)
+		{
+			return $settings;
+		}else{
+			return new \App\Models\Settings;
+		}
+	}
+}
+
+
+/////// Validate Helper Functions ///////
+if (!function_exists('v_image')) {
+	function v_image($ext = null) {
+		if ($ext === null) {
+			return 'image|mimes:jpg,jpeg,png,gif,bmp';
+		} else {
+			return 'image|mimes:'.$ext;
+		}
+
+	}
+}
+/////// Validate Helper Functions ///////
+
+
+if (!function_exists('active_menu')) {
+	function active_menu($link) {
+
+		if (preg_match('/'.$link.'/i', Request::segment(2))) {
+			return ['menu-open', 'display:block'];
+		} else {
+			return ['', ''];
+		}
+	}
+}
+
+//////////////////////////////////////////////////
 
 ?>

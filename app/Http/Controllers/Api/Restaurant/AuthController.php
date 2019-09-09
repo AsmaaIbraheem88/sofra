@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers\Api\Restaurant;
 
-
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use App\Http\Controllers\Controller;
@@ -10,13 +10,10 @@ use App\Http\Controllers\Controller;
 use App\Models\Restaurant;
 use Mail;
 use App\Mail\ResetRestaurant;
-
 use App\Models\Token;
-
-
 use Illuminate\Validation\Rule;
-
 use Illuminate\Support\Facades\Auth;
+
 
 class AuthController extends Controller
 {
@@ -33,12 +30,13 @@ class AuthController extends Controller
         'district_id' => 'required|exists:districts,id',
         'phone' => 'required|unique:restaurants|digits:11',
         'password' => 'required|confirmed',
-        'email' => 'required|unique:restaurants',
-        'minimum_charge' => 'required',
-        'delivery_cost' => 'required',
-        'whatsapp_link' => 'required',
-        'image' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048'
-
+        'email' => 'required|unique:restaurants,email',
+        'minimum_charge' => 'required|numeric',
+        'delivery_cost' => 'required|numeric',
+        'whatsapp' => 'required',
+        'image' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+        'categories_list'      => 'required|array',
+        'categories_list.*'    => 'required'    // validation on records  in array
       ]);
 
        if($validator->fails())
@@ -57,12 +55,16 @@ class AuthController extends Controller
         $restaurant->email= $request->input('email');
         $restaurant->minimum_charge= $request->input('minimum_charge');
         $restaurant->delivery_cost= $request->input('delivery_cost');
-        $restaurant->whatsapp_link= $request->input('whatsapp_link');
+        $restaurant->whatsapp= $request->input('whatsapp');
 
         $restaurant->api_token = str_random('60');
 
+        
 
         if($request->hasFile('image')){
+
+          
+
           $fileNameWithExt = $request->file('image')->getClientOriginalName();
           // get file name
           $filename = pathinfo($fileNameWithExt, PATHINFO_FILENAME);
@@ -71,13 +73,18 @@ class AuthController extends Controller
 
           $fileNameToStore = $filename.'_'.time().'.'.$extension;
           // upload
-          $path = $request->file('image')->storeAs('public/admin/images/restaurants', $fileNameToStore);
+          $path = $request->file('image')->storeAs('public/restaurants', $fileNameToStore);
 
           $restaurant->image = $fileNameToStore;
 
         };
 
         $restaurant->save();
+
+        if ($request->has('categories_list')) {
+
+          $restaurant->categories()->attach($request->categories_list);
+      }
         
 
       return responseJson('1','تم التسجيل بنجاح',[
@@ -122,7 +129,7 @@ class AuthController extends Controller
 
         //Check if restaurant active or no 
         
-        if( $restaurant->is_active == 0)
+        if( $restaurant->is_active == 'inactive')
         {
           return responseJson('0','تم حظر حسابك ');
         }
@@ -241,7 +248,8 @@ class AuthController extends Controller
           'minimum_charge' => 'required',
           'delivery_cost' => 'required',
           'whatsapp_link' => 'required',
-          'image' => 'image|mimes:jpeg,png,jpg,gif,svg|max:2048'
+          'image' => 'image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+          'categories_list'      => 'array|required',
         
 
         ]);
@@ -258,6 +266,12 @@ class AuthController extends Controller
       $loginUser = $request->user(); // object restaurant Model
        
       $loginUser->update($request->except(['password','image']));
+      
+      
+
+      $request->user()->categories()->sync($request->categories_list);
+
+
 
 
       if ($request->has('password'))
@@ -267,6 +281,8 @@ class AuthController extends Controller
 
       if($request->hasFile('image')){
 
+        Storage::delete('public/restaurants/'.$loginUser->image);
+
         $fileNameWithExt = $request->file('image')->getClientOriginalName();
         // get file name
         $filename = pathinfo($fileNameWithExt, PATHINFO_FILENAME);
@@ -275,7 +291,7 @@ class AuthController extends Controller
 
         $fileNameToStore = $filename.'_'.time().'.'.$extension;
         // upload
-        $path = $request->file('image')->storeAs('public/admin/images', $fileNameToStore);
+        $path = $request->file('image')->storeAs('public/restaurants', $fileNameToStore);
 
         $loginUser->image = $fileNameToStore;
 
@@ -403,6 +419,7 @@ public function notificationsCount(Request $request)
 
 
     return responseJson('1','',compact('count','total','commission','payments'));
+
 
 
   } 

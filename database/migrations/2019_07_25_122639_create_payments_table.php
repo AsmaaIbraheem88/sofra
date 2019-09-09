@@ -11,7 +11,7 @@ class CreatePaymentsTable extends Migration {
 			$table->increments('id');
 			$table->timestamps();
 			$table->integer('restaurant_id');
-			$table->datetime('payment_date');
+			$table->string('note')->nullable();
 			$table->decimal('amount');
 		});
 	}

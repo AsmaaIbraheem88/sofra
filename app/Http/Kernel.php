@@ -61,7 +61,14 @@ class Kernel extends HttpKernel
         'signed' => \Illuminate\Routing\Middleware\ValidateSignature::class,
         'throttle' => \Illuminate\Routing\Middleware\ThrottleRequests::class,
         'verified' => \Illuminate\Auth\Middleware\EnsureEmailIsVerified::class,
+
         'check-commissions' => \App\Http\Middleware\CheckCommissions::class,
+        'admin' => \App\Http\Middleware\Admin::class,
+        'Lang' => \App\Http\Middleware\Lang::class,
+        'role' => \Zizaco\Entrust\Middleware\EntrustRole::class,
+        'permission' => \Zizaco\Entrust\Middleware\EntrustPermission::class,
+        'ability' => \Zizaco\Entrust\Middleware\EntrustAbility::class,
+        'auto-check-permission' => \App\Http\Middleware\AutoCheckPermission::class,
         
     ];
 

@@ -9,7 +9,7 @@ class Client extends Model
 
     protected $table = 'clients';
     public $timestamps = true;
-    protected $fillable = array('name', 'email', 'phone', 'district_id', 'password', 'pin_code', 'is_active');
+    protected $fillable = array('name', 'email', 'phone', 'district_id','address' ,'profile_image','password', 'pin_code', 'is_active');
 
     public function comments()
     {

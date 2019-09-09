@@ -10,7 +10,8 @@ class CreateDistrictsTable extends Migration {
 		Schema::create('districts', function(Blueprint $table) {
 			$table->increments('id');
 			$table->timestamps();
-			$table->string('name');
+			$table->string('name_ar');
+			$table->string('name_en');
 			$table->integer('city_id');
 		});
 	}

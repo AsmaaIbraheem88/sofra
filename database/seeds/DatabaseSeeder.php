@@ -15,6 +15,8 @@ class DatabaseSeeder extends Seeder
             districtsTableSeeder::class,
 	        citiesTableSeeder::class,
 	        categoriesTableSeeder::class,
-    	]);
+        ]);
+        
+        factory(App\User::class,5)->create();
     }
 }

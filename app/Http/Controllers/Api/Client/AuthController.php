@@ -10,7 +10,7 @@ use App\Models\Client;
 use Mail;
 use App\Mail\ResetPassword;
 use App\Models\Token;
-
+use Illuminate\Support\Facades\Storage;
 
 use Illuminate\Validation\Rule;
 
@@ -30,7 +30,9 @@ class AuthController extends Controller
         'district_id' => 'required|exists:districts,id',
         'phone' => 'required|unique:clients|digits:11',
         'password' => 'required|confirmed',
-        'email' => 'required|unique:clients',
+        'address'   => 'required',
+        'profile_image'  => 'required|image|mimes:png,jpeg',
+        'email' => 'required|unique:clients,email',
 
       ]);
 
@@ -41,10 +43,30 @@ class AuthController extends Controller
 
       }
 
-      $request->merge(['password'=>bcrypt($request->password)]);
+     
+      $request->merge(array('password' => bcrypt($request->password)));
       $client = Client::create($request->all());
       $client->api_token = str_random('60');
+
+      if ($request->hasFile('profile_image')) {
+
+        $fileNameWithExt = $request->file('profile_image')->getClientOriginalName();
+        // get file name
+        $filename = pathinfo($fileNameWithExt, PATHINFO_FILENAME);
+        // get extension
+        $extension = $request->file('profile_image')->getClientOriginalExtension();
+  
+        $fileNameToStore = $filename.'_'.time().'.'.$extension;
+        // upload
+        $path = $request->file('profile_image')->storeAS('public/clients', $fileNameToStore);
+  
+  
+        $client->profile_image = $fileNameToStore;
+  
+      }
+
       $client->save();
+
       return responseJson('1','تم التسجيل بنجاح',[
 
        'api_token'=>$client->api_token,
@@ -87,7 +109,7 @@ class AuthController extends Controller
 
         //Check if client active or no 
         
-        if( $client->is_active == 0)
+        if( $client->is_active == 'inactive')
         {
           return responseJson('0','تم حظر حسابك ');
         }
@@ -203,6 +225,8 @@ class AuthController extends Controller
           'phone'=>[Rule::unique('clients')->ignore($request->user()->id),'required']  ,
           'district_id' => 'required|exists:districts,id',
           'password'=>'confirmed', 
+          'address'   => 'required',
+          'profile_image'  => 'image|mimes:png,jpeg',
         
 
         ]);
@@ -218,7 +242,7 @@ class AuthController extends Controller
 
       $loginUser = $request->user(); // object Client Model
        
-      $loginUser->update($request->except(['password']));
+      $loginUser->update($request->except(['password','profile_image']));
 
 
       if ($request->has('password'))
@@ -226,9 +250,30 @@ class AuthController extends Controller
           $loginUser->password = bcrypt($request->password);
       }
 
+      if ($request->hasFile('profile_image')) {
+
+       Storage::delete('public/clients/'.$loginUser->profile_image);
+
+       $fileNameWithExt = $request->file('profile_image')->getClientOriginalName();
+       // get file name
+       $filename = pathinfo($fileNameWithExt, PATHINFO_FILENAME);
+       // get extension
+       $extension = $request->file('profile_image')->getClientOriginalExtension();
+ 
+       $fileNameToStore = $filename.'_'.time().'.'.$extension;
+       // upload
+       $path = $request->file('profile_image')->storeAS('public/clients', $fileNameToStore);
+ 
+ 
+       $loginUser->profile_image = $fileNameToStore;
+    }
+
       $loginUser->save();
 
-      return responseJson(1,'تم تحديث البيانات',$loginUser);
+      $data = [
+        'client' => $request->user()->load('district')
+      ];
+      return responseJson(1, 'تم تحديث البيانات', $data);
 
 
     }
@@ -238,7 +283,7 @@ class AuthController extends Controller
   public function notifications(Request $request)
   {
 
-    $notifications = $request->user()->notifications()->latest()->paginate(10);
+    $notifications = $request->user()->notifications()->with('notificationable.district','order.client.district','order.restaurant.district')->latest()->paginate(10);
     return responseJson(1,'success ',$notifications);
 
   }
@@ -356,6 +401,16 @@ public function notificationsCount(Request $request)
 
       }
 
+      
+      $clientOrders= $request->user()->whereHas('orders',function($query) use ($request){
+          $query->where('restaurant_id', $request->restaurant_id)
+                ->where('status', 'accepted');
+     })->count();
+     
+                                 
+      if ($clientOrders == 0) {
+          return responseJson(0, 'لا يمكن التقييم الا بعد تنفيذ طلب من المطعم');
+      }
      
 
       $request->user()->comments()->create([

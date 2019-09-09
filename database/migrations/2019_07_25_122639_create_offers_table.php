@@ -10,9 +10,11 @@ class CreateOffersTable extends Migration {
 		Schema::create('offers', function(Blueprint $table) {
 			$table->increments('id');
 			$table->timestamps();
-			$table->text('content');
+			$table->text('content_ar');
+			$table->string('title_en');
+			$table->text('content_en');
+			$table->string('title_ar');
 			$table->integer('restaurant_id');
-			$table->string('title');
 			$table->datetime('start_date');
 			$table->datetime('end_date');
 			$table->string('image');

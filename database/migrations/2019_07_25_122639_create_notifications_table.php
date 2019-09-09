@@ -10,8 +10,10 @@ class CreateNotificationsTable extends Migration {
 		Schema::create('notifications', function(Blueprint $table) {
 			$table->increments('id');
 			$table->timestamps();
-			$table->string('title');
-			$table->text('content');
+			$table->string('title_ar');
+			$table->text('content_ar');
+			$table->string('title_en');
+			$table->text('content_en');
 			$table->enum('action', array('requested', 'accepted', 'pending', 'rejected', 'deliverd'));
 			$table->integer('notificationable_id');
 			$table->string('notificationable_type');

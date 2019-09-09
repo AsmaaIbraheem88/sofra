@@ -9,7 +9,7 @@ class District extends Model
 
     protected $table = 'districts';
     public $timestamps = true;
-    protected $fillable = array('name', 'city_id');
+    protected $fillable = array('name_ar','name_en', 'city_id');
 
     public function city()
     {

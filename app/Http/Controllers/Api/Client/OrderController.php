@@ -115,11 +115,11 @@ class OrderController extends Controller
 
         /* notification */
         
-        $notifications = $restaurant->notifications()->create([
+        $restaurant->notifications()->create([
 
-            'title' => 'لديك طلب جديد',
+            'title_ar' => 'لديك طلب جديد',
             'title_en' => 'You Have New Order ',
-            'content' => '  لديك طلب جديد من العميل '.$request->user()->name,
+            'content_ar' => '  لديك طلب جديد من العميل '.$request->user()->name,
             'content_en' => 'You Have New Order By Client'.$request->user()->name,
             'order_id' => $order->id,
 
@@ -127,24 +127,26 @@ class OrderController extends Controller
 
         $tokens =$restaurant->tokens()->where('token','!=','')->pluck('token')->toArray();
 
-        if(count($tokens))
-        {
-          $title = $notifications->title;
-          $body = $notifications->content;
-          $data =[
-  
+        
+
+
+        $title =  ' لديك طلب جديد من العميل ';
+        $body =  ' لديك طلب جديد من العميل ';
+        $data =[
+
             'user_type' => 'restaurant',
             'action' => 'new-order',
             'order_id' => $order->id
-  
-          ];
-  
-          $send = notifyByFirebase($title,$body,$tokens,$data);
-  
-          dd($send);
-          
-        }
+
+        ];
+
+        
        
+        $send = notifyByFirebase($title,$body,$tokens,$data);
+      
+        // dd($send);
+        
+
          /* notification */
 
          $orderData =[
@@ -168,21 +170,7 @@ class OrderController extends Controller
     public function declineOrder(Request $request )
 
     {
-
-        $validator = validator()->make($request->all(),[
-
-            'order_id' => 'required|exists:orders,id',
-        ]);
-    
-        if($validator->fails())
-        {
-        $data = $validator->errors();
-        return responseJson('0',$validator->errors()->first(),$data);
-
-        }
-    
-
-        $order = Order::find($request->order_id);
+        $order = $request->user()->orders()->findOrFail($request->order_id);
 
         if($order->status == 'delivered' || $order->status == 'accepted')
         {
@@ -193,14 +181,17 @@ class OrderController extends Controller
             $restaurant = $order->restaurant;
        
              /* notification */
-           $restaurant->notifications()->create([
+        
     
-            'title' => ' تم رفض الطلب من العميل ',
-            'content' => ' تم رفض الطلب من العميل ',
-            'order_id' => $order->id,
+            $restaurant->notifications()->create([
+              'title_ar'      => 'تم رفض توصيل طلبك من العميل',
+              'title_en'   => 'Your order delivery is declined by client',
+              'content_ar'    => 'تم رفض التوصيل للطلب رقم ' . $request->order_id . ' للعميل',
+              'content_en' => 'Delivery if order no. ' . $request->order_id . ' is declined by client',
+              'order_id'   => $request->order_id,
+          ]);
     
-            ]);
-    
+           
             
             $tokens =$restaurant->tokens()->where('token','!=','')->pluck('token')->toArray();
             
@@ -238,19 +229,7 @@ class OrderController extends Controller
 
     {
 
-        $validator = validator()->make($request->all(),[
-
-            'order_id' => 'required|exists:orders,id',
-        ]);
-    
-        if($validator->fails())
-        {
-        $data = $validator->errors();
-        return responseJson('0',$validator->errors()->first(),$data);
-
-        }
-
-        $order = Order::find($request->order_id);
+      $order = $request->user()->orders()->findOrFail($request->order_id);
 
         if($order->status == 'accepted')
         {
@@ -264,9 +243,11 @@ class OrderController extends Controller
            /* notification */
           $restaurant->notifications()->create([
   
-          'title' => ' تم استلام الطلب من العميل ',
-          'content' => ' تم استلام الطلب من العميل ',
-          'order_id' => $order->id,
+            'title_ar'      => 'تم تأكيد توصيل طلبك من العميل',
+            'title_en'   => 'Your order is delivered to client',
+            'content_ar'    => 'تم تأكيد التوصيل للطلب رقم ' . $request->order_id . ' للعميل',
+            'content_en' => 'Order no. ' . $request->order_id . ' is delivered to client',
+            'order_id'   => $request->order_id,
   
           ]);
   
@@ -325,7 +306,8 @@ class OrderController extends Controller
                     ->orWhere('orders.status','declined');
           }
 
-      })->paginate(20);
+      })->with('restaurant','meals','client')->paginate(20);
+     
       return responseJson(1, 'success',  $orders);
 
 
@@ -335,7 +317,7 @@ class OrderController extends Controller
 
   public function order(Request $request)
   {
-      $order = Order::find($request->order_id);
+      $order = Order::with('restaurant','meals','client')->find($request->order_id);
 
       if (!$order) {
         return responseJson(0, '404 no order found');

@@ -9,7 +9,7 @@ class Offer extends Model
 
     protected $table = 'offers';
     public $timestamps = true;
-    protected $fillable = array('content', 'restaurant_id', 'title', 'start_date', 'end_date', 'image');
+    protected $fillable = array('content_ar','content_en', 'restaurant_id', 'title_ar','title_en', 'start_date', 'end_date', 'image');
 
    
 

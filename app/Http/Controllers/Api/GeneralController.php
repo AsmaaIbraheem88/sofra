@@ -32,28 +32,24 @@ class GeneralController extends Controller
 
     public function cities( )
     {
-        $cities = City::all();
-
-        return  responseJson('1','success',$cities);
+        $cities = City::where(function($q) use($request){
+            if ($request->has('name')){
+                $q->where('name','LIKE','%'.$request->name.'%');
+            }
+        })->paginate(10);
+        return responseJson(1,'تم التحميل',$cities);
     }
 
     ////////////////////////////////////////////
 
     public function districts(Request $request )
     {
-        $districts = District::where(function ($query) use($request){
-
-            if($request->has('city_id'))
-      
-            {
-             $query->where('city_id',$request->city_id);
-      
+        $districts = District::where(function($query) use($request){
+            if ($request->has('name')){
+                $query->where('name','LIKE','%'.$request->name.'%');
             }
-      
-           })->get();
-        
-
-        return responseJson('1','success',$districts);
+        })->where('city_id',$request->city_id)->paginate(10);
+        return responseJson(1,'تم التحميل',$districts);
     }
 
     ////////////////////////////////////////////
@@ -68,13 +64,10 @@ class GeneralController extends Controller
 
     ////////////////////////////////////////////
 
-    public function settings( )
+    public function settingsAll( )
     {
-        return responseJson(1, 'loaded', settings());
-
-        // $settings = Settings::find(1);
-
-        // return responseJson('1','success',$settings);
+       return responseJson(1, 'loaded', setting());
+        
     }
 
     ///////////////////////////////////////////////////
@@ -91,7 +84,7 @@ class GeneralController extends Controller
     public function restaurants(Request $request)//// with filter//
     {
        
-        $restaurants = Restaurant::with('categories')->where(function($query) use($request){
+        $restaurants = Restaurant::with('district','categories')->where(function($query) use($request){
 
             if ($request->input('city_id'))
             {
@@ -108,15 +101,18 @@ class GeneralController extends Controller
                 });
             }
 
-        })->paginate(20);
+        })->has('meals')->with('district', 'categories')->activated()->paginate(20);
         return responseJson(1, 'success', $restaurants);
+
+        
     }
 
     ///////////////////////////////////////////////////
 
     public function restaurant(Request $request)
     {
-        $restaurant = Restaurant::with('categories')->find($request->restaurant_id);
+       
+        $restaurant = Restaurant::with('district','categories')->activated()->find($request->restaurant_id);
 
         if (!$restaurant) {
             return responseJson(0, '404 no restaurant found');
@@ -130,7 +126,7 @@ class GeneralController extends Controller
 
     public function meals(Request $request)
     {
-        $meals = Meal::where('restaurant_id',$request->restaurant_id)->paginate(10);
+        $meals = Meal::where('restaurant_id',$request->restaurant_id)->enabled()->paginate(10);
 
         return responseJson('1','success',$meals);
     }
@@ -152,30 +148,41 @@ class GeneralController extends Controller
 
     public function comments( Request $request)
     {
-        $comments = Comment::with('client')->where('restaurant_id',$request->restaurant_id)->paginate(10);
-
-        return responseJson('1','success',$comments);
-
+        $restuarant = Restaurant::find($request->restaurant_id);
+        if (!$restuarant)
+        {
+            return responseJson(0,'no data');
+        }
+        $comments = $restuarant->comments()->paginate(10);
+        return responseJson(1,'success',$comments);
     }
 
     ///////////////////////////////////////////////////
 
 
-    public function offers( )
+    public function offers( Request $request )
     {
         $now = Carbon::now()->toDateTimeString();
-        $offers = Offer::where('start_date', '<=', $now)
-        ->where('end_date', '>=', $now)
-        ->latest()->paginate(20);
+
+        $offers = Offer::where(function($offer) use($request){
+
+            if($request->has('restaurant_id'))
+            {
+                $offer->where('restaurant_id',$request->restaurant_id);
+            }
+        })->where('start_date', '<=', $now)->where('end_date', '>=', $now)->has('restaurant')->with('restaurant')->latest()->paginate(20);
+
 
         return responseJson('1','success',$offers);
+
+      
     }
 
     ///////////////////////////////////////////////////
 
     public function offer( Request $request)
     {
-        $offer = Offer::find($request->offer_id);
+        $offer = Offer::with('restaurant')->find($request->offer_id);
 
         if (!$offer) {
             return responseJson(0, '404 no offer found');
@@ -192,6 +199,7 @@ class GeneralController extends Controller
         $validator = validator()->make($request->all(),[
             'name' => 'required',
             'subject' => 'required',
+           // 'type' => 'required|in:complaint,suggestion,inquiry',
             'type' => [
                 'required',
                  Rule::in(['complaint', 'suggestion','enquiry']),
@@ -208,9 +216,9 @@ class GeneralController extends Controller
           }
         
     
-            $contact = Contact::create($request->all()); 
+            $contact = Contact::create($request->all()); //we can use this only and  not send mail
     
-          Mail::to('laravelemail2019@gmail.com')
+          Mail::to('laravelemail2019@gmail.com') //   Mail::to(setting()->email)
                    ->send(new ContactUs( $contact));
     
                    return responseJson('1','Thanks for contacting us!');

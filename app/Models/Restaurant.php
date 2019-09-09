@@ -9,7 +9,7 @@ class Restaurant extends Model
 
     protected $table = 'restaurants';
     public $timestamps = true;
-    protected $fillable = array('name', 'email', 'phone', 'district_id', 'minimum_charge', 'delivery_cost', 'whatsapp_link', 'image', 'status');
+    protected $fillable = array('name', 'email', 'phone', 'district_id', 'minimum_charge', 'delivery_cost', 'whatsapp', 'image', 'status');
 
 
 
@@ -68,6 +68,11 @@ class Restaurant extends Model
     {
         $payments = $this->payments()->sum('amount');
         return $payments;
+    }
+
+    public function scopeActivated($query)
+    {
+        return $query->where('is_active','active');
     }
 
 

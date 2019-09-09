@@ -10,13 +10,16 @@ class CreateMealsTable extends Migration {
 		Schema::create('meals', function(Blueprint $table) {
 			$table->increments('id');
 			$table->timestamps();
-			$table->string('name');
+			$table->string('name_ar');
+			$table->string('name_en');
 			$table->string('image')->nullable();
 			$table->decimal('price');
 			$table->decimal('discount_price');
 			$table->string('processing_time');
-			$table->text('description');
+			$table->text('description_ar');
+			$table->text('description_en');
 			$table->integer('restaurant_id');
+			$table->enum('disabled', array('disable', 'enable'))->default('enable');
 		});
 	}
 
