@@ -12,10 +12,8 @@ Orders
   </div>
   <!-- /.box-header -->
   <div class="box-body">
-    <div class="row">
-      <div class="col-xs-12 table-responsive">
-    
-        
+  <div class="col-xs-12">
+       <div class="table-responsive">
       
       {!! $dataTable->table(['class'=>'dataTable table table-striped   table-bordered']) !!}
      

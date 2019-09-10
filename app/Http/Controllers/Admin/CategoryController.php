@@ -4,6 +4,7 @@ use App\DataTables\CategoryDatatable;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Category;
+use Response;
 
 class CategoryController extends Controller {
 	/**
@@ -103,18 +104,51 @@ class CategoryController extends Controller {
 	 * @return \Illuminate\Http\Response
 	 */
 	public function destroy($id) {
-		Category::findOrFail($id)->delete();
-		session()->flash('success', trans('admin.deleted_record'));
+
+		$category = Category::findOrFail($id);
+		$count = $category->restaurants()->count();
+		if (!$count)
+		{
+			$category->delete();
+
+			session()->flash('success', trans('admin.deleted_name',['name'=> session('lang') == 'ar'?$category->name_ar:$category->name_en ]
+				));
+			return redirect(aurl('categories'));
+			
+		}
+
+		session()->flash('error', trans('admin.you can not delete',['name'=> session('lang') == 'ar'?$category->name_ar:$category->name_en ]));
 		return redirect(aurl('categories'));
 	}
 
+
+
+
 	public function multi_delete() {
+
 		if (is_array(request('item'))) {
-			Category::destroy(request('item'));
-		} else {
-			Category::findOrFail(request('item'))->delete();
-		}
-		session()->flash('success', trans('admin.deleted_record'));
+
+			foreach(request('item') as $item){
+
+				$category = Category::findOrFail($item);
+				$count = $category->restaurants()->count();
+				if (!$count)
+				{
+					$category->delete();
+					session()->flash('success', trans('admin.deleted_name',['name'=> session('lang') == 'ar'?$category->name_ar:$category->name_en ]));
+				}else{
+					session()->flash('error', trans('admin.you can not delete',['name'=> session('lang') == 'ar'?$category->name_ar:$category->name_en ]));
+				}
+				
+			}
+			
+		} 
+
 		return redirect(aurl('categories'));
 	}
+
+
+
 }
+
+

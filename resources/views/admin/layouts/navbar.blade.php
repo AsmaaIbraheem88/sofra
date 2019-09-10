@@ -121,10 +121,10 @@
 
 
 
-        <li class="treeview"><a href="{{ aurl('settings') }}"><i class="fa fa-cog"></i> <span>{{ trans('admin.settings') }}</span> </a> </li>
-        <li class="treeview"><a href="{{ aurl('contacts') }}"><i class="fa fa-envelope"></i> <span>{{ trans('admin.contacts') }}</span> </a> </li>
-       <li class="treeview"><a href="{{ aurl('clients') }}"><i class="fa fa-users"></i> <span>{{ trans('admin.clients') }}</span> </a> </li>
-       <li class="treeview"><a href="{{ aurl('orders') }}"><i class="fa fa-tasks"></i> <span>{{ trans('admin.orders') }}</span> </a> </li>
+        <li ><a href="{{ aurl('settings') }}"><i class="fa fa-cog"></i> <span>{{ trans('admin.settings') }}</span> </a> </li>
+        <li><a href="{{ aurl('contacts') }}"><i class="fa fa-envelope"></i> <span>{{ trans('admin.contacts') }}</span> </a> </li>
+       <li><a href="{{ aurl('clients') }}"><i class="fa fa-users"></i> <span>{{ trans('admin.clients') }}</span> </a> </li>
+       <li><a href="{{ aurl('orders') }}"><i class="fa fa-tasks"></i> <span>{{ trans('admin.orders') }}</span> </a> </li>
        <li><a href="{{aurl('change-password')}}"><i class="fa fa-key"></i>{{ trans('admin.change_password') }}</a></li>
       </ul>
     </section>

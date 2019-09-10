@@ -67,8 +67,9 @@ return [
 	'deleted_record'               => 'تم الحذف للبيانات بنجاح',
 	'delete_this'                  => 'هل انت موافق على حذف :name ؟',
 	'yes'                      => 'حسنا ',
+	'no'                      => 'لا',
 	'close'                    => 'غلق ',
-	'ask_delete_item'              => 'هل انت موافق على حذف السجلات التالية وهي عددها ؟',
+	'ask_delete_item'              => 'هل انت موافق على حذف السجلات التالية وهي عددها ',
 	'please_check_some_records'    => 'من فضلك قم باختيار بعض السجلات للحذف',
 	'active'          => 'مفعل',
 	'inactive'          => 'غير مفعل ',
@@ -77,6 +78,9 @@ return [
 	'Sign_out'          => 'خروج',
 	'profile'          => 'الملف الشخصي',
 	'change_password'          => 'تغيير كلمه السر',
+	'you can not delete'          => 'لا يمكن مسح  :name ',
+	'deleted_name'               => 'تم حذف :name بنجاح ',
+	
 	
 	
 

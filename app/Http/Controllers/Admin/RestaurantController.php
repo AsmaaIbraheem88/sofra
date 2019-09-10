@@ -82,20 +82,48 @@ class RestaurantController extends Controller {
 	 * @return \Illuminate\Http\Response
 	 */
 	public function destroy($id) {
-		Restaurant::findOrFail($id)->delete();
-		session()->flash('success', trans('admin.deleted_record'));
+
+		$restaurant = Restaurant::findOrFail($id);
+		$count = $restaurant->orders()->count();
+		if (!$count)
+		{
+			$restaurant->delete();
+
+			session()->flash('success', trans('admin.deleted_name',['name'=>$restaurant->name ]));
+			return redirect(aurl('restaurants'));
+			
+		}
+
+		session()->flash('error', trans('admin.you can not delete',['name'=>$restaurant->name ]));
 		return redirect(aurl('restaurants'));
 	}
 
+
+
+
 	public function multi_delete() {
+
 		if (is_array(request('item'))) {
-			Restaurant::destroy(request('item'));
-		} else {
-			Restaurant::findOrFail(request('item'))->delete();
-		}
-		session()->flash('success', trans('admin.deleted_record'));
+
+			foreach(request('item') as $item){
+
+				$restaurant = Restaurant::findOrFail($item);
+				$count = $restaurant->orders()->count();
+				if (!$count)
+				{
+					$restaurant->delete();
+					session()->flash('success', trans('admin.deleted_name',['name'=>$restaurant->name ]));
+				}else{
+					session()->flash('error', trans('admin.you can not delete',['name'=>$restaurant->name ]));
+				}
+				
+			}
+			
+		} 
+
 		return redirect(aurl('restaurants'));
 	}
+
 
 	public function activated($id)
     

@@ -105,18 +105,46 @@ class CityController extends Controller {
 	 * @return \Illuminate\Http\Response
 	 */
 	public function destroy($id) {
-		City::findOrFail($id)->delete();
-		session()->flash('success', trans('admin.deleted_record'));
+
+		$city = City::findOrFail($id);
+		$count = $city->districts()->count();
+		if (!$count)
+		{
+			$city->delete();
+
+			session()->flash('success', trans('admin.deleted_name',['name'=> session('lang') == 'ar'?$city->name_ar:$city->name_en ]
+				));
+			return redirect(aurl('cities'));
+			
+		}
+
+		session()->flash('error', trans('admin.you can not delete',['name'=> session('lang') == 'ar'?$city->name_ar:$city->name_en ]));
 		return redirect(aurl('cities'));
 	}
 
+
+
+
 	public function multi_delete() {
+
 		if (is_array(request('item'))) {
-			City::destroy(request('item'));
-		} else {
-			City::findOrFail(request('item'))->delete();
-		}
-		session()->flash('success', trans('admin.deleted_record'));
+
+			foreach(request('item') as $item){
+
+				$city = City::findOrFail($item);
+				$count = $city->districts()->count();
+				if (!$count)
+				{
+					$city->delete();
+					session()->flash('success', trans('admin.deleted_name',['name'=> session('lang') == 'ar'?$city->name_ar:$city->name_en ]));
+				}else{
+					session()->flash('error', trans('admin.you can not delete',['name'=> session('lang') == 'ar'?$city->name_ar:$city->name_en ]));
+				}
+				
+			}
+			
+		} 
+
 		return redirect(aurl('cities'));
 	}
 }

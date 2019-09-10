@@ -12,11 +12,12 @@ Restaurants
   <!-- /.box-header -->
   <div class="box-body">
     <div class="row">
-      <div class="col-xs-12 table-responsive">
-    
+      <div class="col-xs-12">
+       <div class="table-responsive">
         {!! Form::open(['id'=>'form_data','url'=>aurl('restaurants/destroy/all'),'method'=>'delete']) !!}
         {!! $dataTable->table(['class'=>'dataTable table table-striped   table-bordered'],true) !!}
         {!! Form::close() !!}
+        </div>
       </div>
     </div>
   </div>

@@ -75,21 +75,56 @@ class ClientController extends Controller {
 	 * @param  int  $id
 	 * @return \Illuminate\Http\Response
 	 */
+
+
 	public function destroy($id) {
-		Client::findOrFail($id)->delete();
-		session()->flash('success', trans('admin.deleted_record'));
+
+		$client = Client::findOrFail($id);
+		$count = $client->comments()->count();
+		if (!$count)
+		{
+			$client->delete();
+
+			session()->flash('success', trans('admin.deleted_name',['name'=>$client->name ]));
+			return redirect(aurl('clients'));
+			
+		}
+
+		session()->flash('error', trans('admin.you can not delete',['name'=>$client->name ]));
 		return redirect(aurl('clients'));
 	}
 
+
+
+
 	public function multi_delete() {
+
 		if (is_array(request('item'))) {
-			Client::destroy(request('item'));
-		} else {
-			Client::findOrFail(request('item'))->delete();
-		}
-		session()->flash('success', trans('admin.deleted_record'));
+
+			foreach(request('item') as $item){
+
+				$client = Client::findOrFail($item);
+				$count = $client->comments()->count();
+				if (!$count)
+				{
+					$client->delete();
+					session()->flash('success', trans('admin.deleted_name',['name'=>$client->name ]));
+				}else{
+					session()->flash('error', trans('admin.you can not delete',['name'=>$client->name ]));
+				}
+				
+			}
+			
+		} 
+
 		return redirect(aurl('clients'));
 	}
+
+
+
+
+
+
 
 	public function activated($id)
     

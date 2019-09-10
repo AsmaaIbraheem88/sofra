@@ -79,7 +79,8 @@ return [
 	'Sign_out'                     => 'Sign_out',
 	'profile'                       => 'Profile',
 	'change_password'               => 'Change Password',
-	
+	'you can not delete'          => ' you can not delete :name ',
+	'deleted_name'               => 'deleted :name ',
 	
 	
 

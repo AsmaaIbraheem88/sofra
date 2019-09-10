@@ -29,12 +29,17 @@
     } */
   </style>
   @endif
+
+  <style type="text/css">
+   .table-responsive{
+      overflow-y:hidden;
+    }
+  </style>
   
   <!-- AdminLTE Skins. Choose a skin from the css/skins
        folder instead of downloading all of them to reduce the load. -->
   <link rel="stylesheet" href="{{asset('adminlte/dist/css/skins/_all-skins.min.css')}}">
-  <!-- Morris chart -->
-  <link rel="stylesheet" href="{{asset('adminlte/bower_components/morris.js/morris.css')}}">
+
   <!-- jvectormap -->
   <link rel="stylesheet" href="{{asset('adminlte/bower_components/jvectormap/jquery-jvectormap.css')}}">
   <!-- Date Picker -->

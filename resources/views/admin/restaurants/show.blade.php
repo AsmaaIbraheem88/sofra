@@ -112,6 +112,7 @@ Restaurants
 @push('js')
 <script>
     function print(){
+    
         var value1=document.getElementById('printpage').innerHTML;
         var value2=document.body.innerHTML;
         document.body.innerHTML=value1;

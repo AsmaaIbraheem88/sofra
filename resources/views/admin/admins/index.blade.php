@@ -14,9 +14,13 @@
   </div>
   <!-- /.box-header -->
   <div class="box-body">
+  <div class="col-xs-12">
+    <div class="table-responsive">
     {!! Form::open(['id'=>'form_data','url'=>aurl('admin/destroy/all'),'method'=>'delete']) !!}
     {!! $dataTable->table(['class'=>'dataTable table table-striped table-hover  table-bordered'],true) !!}
     {!! Form::close() !!}
+    </div>
+  </div>
   </div>
   <!-- /.box-body -->
 </div>

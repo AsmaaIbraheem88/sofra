@@ -136,18 +136,46 @@ class RoleController extends Controller {
 	 * @return \Illuminate\Http\Response
 	 */
 	public function destroy($id) {
-		Role::findOrFail($id)->delete();
-		session()->flash('success', trans('admin.deleted_record'));
+
+		$role = Role::findOrFail($id);
+		$count = $role->users()->count();
+		if (!$count)
+		{
+			$role->delete();
+
+			session()->flash('success', trans('admin.deleted_name',['name'=>$role->name ]));
+			return redirect(aurl('roles'));
+			
+		}
+
+		session()->flash('error', trans('admin.you can not delete',['name'=>$role->name ]));
 		return redirect(aurl('roles'));
 	}
 
+
+
+
 	public function multi_delete() {
+
 		if (is_array(request('item'))) {
-			Role::destroy(request('item'));
-		} else {
-			Role::findOrFail(request('item'))->delete();
-		}
-		session()->flash('success', trans('admin.deleted_record'));
+
+			foreach(request('item') as $item){
+
+				$role = Role::findOrFail($item);
+				$count = $role->users()->count();
+				if (!$count)
+				{
+					$role->delete();
+					session()->flash('success', trans('admin.deleted_name',['name'=>$role->name ]));
+				}else{
+					session()->flash('error', trans('admin.you can not delete',['name'=>$role->name ]));
+				}
+				
+			}
+			
+		} 
+
 		return redirect(aurl('roles'));
 	}
+
 }

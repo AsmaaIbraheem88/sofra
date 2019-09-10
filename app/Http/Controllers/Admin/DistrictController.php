@@ -110,18 +110,48 @@ class DistrictController extends Controller {
 	 * @return \Illuminate\Http\Response
 	 */
 	public function destroy($id) {
-		District::findOrFail($id)->delete();
-		session()->flash('success', trans('admin.deleted_record'));
+
+		$district = District::findOrFail($id);
+		$count1 = $district->clients()->count();
+		$count2 = $district->restaurants()->count();
+		if (!$count1 || !$count2)
+		{
+			$district->delete();
+
+			session()->flash('success', trans('admin.deleted_name',['name'=> session('lang') == 'ar'?$district->name_ar:$district->name_en ]));
+			return redirect(aurl('districts'));
+			
+		}
+
+		session()->flash('error', trans('admin.you can not delete',['name'=> session('lang') == 'ar'?$district->name_ar:$district->name_en ]));
 		return redirect(aurl('districts'));
 	}
 
+
+
+
 	public function multi_delete() {
+
 		if (is_array(request('item'))) {
-			District::destroy(request('item'));
-		} else {
-			District::findOrFail(request('item'))->delete();
-		}
-		session()->flash('success', trans('admin.deleted_record'));
+
+			foreach(request('item') as $item){
+
+				$district = District::findOrFail($item);
+				$count1 = $district->clients()->count();
+				$count2 = $district->restaurants()->count();
+				if (!$count1 || !$count2)
+				{
+					$district->delete();
+					session()->flash('success', trans('admin.deleted_name',['name'=> session('lang') == 'ar'?$district->name_ar:$district->name_en ]));
+				}else{
+					session()->flash('error', trans('admin.you can not delete',['name'=> session('lang') == 'ar'?$district->name_ar:$district->name_en ]));
+				}
+				
+			}
+			
+		} 
+
 		return redirect(aurl('districts'));
 	}
+
 }
