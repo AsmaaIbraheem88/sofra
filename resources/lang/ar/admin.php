@@ -80,6 +80,7 @@ return [
 	'change_password'          => 'تغيير كلمه السر',
 	'you can not delete'          => 'لا يمكن مسح  :name ',
 	'deleted_name'               => 'تم حذف :name بنجاح ',
+	'delete'               => 'حذف',
 	
 	
 	

@@ -74,18 +74,18 @@ class ContactController extends Controller {
 	 * @return \Illuminate\Http\Response
 	 */
 	public function destroy($id) {
-		Offer::findOrFail($id)->delete();
+		Contact::findOrFail($id)->delete();
 		session()->flash('success', trans('admin.deleted_record'));
-		return redirect(aurl('offers'));
+		return redirect(aurl('contacts'));
 	}
 
 	public function multi_delete() {
 		if (is_array(request('item'))) {
-			Offer::destroy(request('item'));
+			Contact::destroy(request('item'));
 		} else {
-			Offer::findOrFail(request('item'))->delete();
+			Contact::findOrFail(request('item'))->delete();
 		}
 		session()->flash('success', trans('admin.deleted_record'));
-		return redirect(aurl('offers'));
+		return redirect(aurl('contacts'));
 	}
 }

@@ -31,7 +31,8 @@ class AdminDatatable extends DataTable {
 	 * @return \Illuminate\Database\Eloquent\Builder
 	 */
 	public function query() {
-		return Admin::query();
+		$id = admin()->user()->id;
+		return Admin::query()->where('id','=!',$id);
 	}
 
 	/**

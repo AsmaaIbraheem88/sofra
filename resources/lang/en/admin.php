@@ -81,7 +81,7 @@ return [
 	'change_password'               => 'Change Password',
 	'you can not delete'          => ' you can not delete :name ',
 	'deleted_name'               => 'deleted :name ',
-	
+	'delete'               => 'Delete',
 	
 
 	//sidebar

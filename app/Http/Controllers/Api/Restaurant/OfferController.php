@@ -51,7 +51,7 @@ class OfferController extends Controller
           $offer->image = $fileNameToStore;
 
 
-        };
+        }
 
         $offer->save();
       
